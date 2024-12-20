@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hangman Game</title>
+    <style>
+      /* Global styles */
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #000000;
+        color: #faf6f6;
+        text-align: center;
+      }
+
+      /* Home Screen */
+      #home-screen {
+        padding: 20px;
+      }
+
+      #home-screen h1 {
+        font-size: 48px;
+        font-weight: bold;
+      }
+
+      .category {
+        background-color: #f3007a;
+        border: none;
+        color: white;
+        padding: 15px 20px;
+        margin: 10px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .category:hover {
+        background-color: #121312;
+      }
+
+      /* Game Screen */
+      #game-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #word-display {
+        font-size: 36px;
+        font-weight: bold;
+        letter-spacing: 10px;
+      }
+
+      #hangman img {
+        width: 150px;
+      }
+
+      #keyboard {
+        margin-top: 20px;
+      }
+
+      button.letter {
+        font-size: 20px;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 5px;
+        background-color: #ff7bbd;
+        cursor: pointer;
+      }
+
+      button.letter:hover {
+        background-color: #1d010c;
+      }
+
+      #game-over {
+        padding: 20px;
+      }
+
+      #game-message {
+        font-size: 32px;
+        font-weight: bold;
+        color: #0166fd;
+      }
+
+      /* Play Again Button */
+      button {
+        background-color: #dd0382;
+        color: white;
+        padding: 15px 25px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      button:hover {
+        background-color: #fd52ca;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="home-screen">
+      <h1>Hangman Game</h1>
+      <div id="category-selection">
+        <button class="category" onclick="startGame('animals')">Animals</button>
+        <button class="category" onclick="startGame('fruits')">Fruits</button>
+        <button class="category" onclick="startGame('countries')">
+          Countries
+        </button>
+      </div>
+    </div>
+
+    <div id="game-screen" style="display: none">
+      <h2>Category: <span id="category-name"></span></h2>
+      <div id="word-display"></div>
+      <div id="hangman">
+        <img id="hangman-image" src="game.png" alt="Hangman" />
+      </div>
+      <div id="keyboard"></div>
+      <p>Lives Left: <span id="lives-left">6</span></p>
+      <p id="message"></p>
+    </div>
+
+    <div id="game-over" style="display: none">
+      <h2 id="game-message"></h2>
+      <button onclick="restartGame()">Play Again</button>
+    </div>
+
+    <script>
+      let words = {
+        animals: ["elephant", "tiger", "giraffe", "zebra"],
+        fruits: ["apple", "banana", "cherry", "mango"],
+        countries: ["india", "canada", "brazil", "japan"],
+      };
+
+      let selectedCategory;
+      let selectedWord;
+      let guessedLetters = [];
+      let lives = 6;
+
+      function startGame(category) {
+        selectedCategory = category;
+        selectedWord =
+          words[category][Math.floor(Math.random() * words[category].length)];
+        guessedLetters = [];
+        lives = 6;
+
+        document.getElementById("category-name").innerText = category;
+        document.getElementById("word-display").innerText = "_ ".repeat(
+          selectedWord.length
+        );
+        document.getElementById("lives-left").innerText = lives;
+        document.getElementById("game-screen").style.display = "block";
+        document.getElementById("home-screen").style.display = "none";
+        document.getElementById("game-over").style.display = "none";
+
+        createKeyboard();
+      }
+
+      function createKeyboard() {
+        let keyboard = document.getElementById("keyboard");
+        keyboard.innerHTML = "";
+        let alphabet = "abcdefghijklmnopqrstuvwxyz";
+        alphabet.split("").forEach((letter) => {
+          let button = document.createElement("button");
+          button.innerText = letter;
+          button.classList.add("letter");
+          button.onclick = () => handleGuess(letter);
+          keyboard.appendChild(button);
+        });
+      }
+
+      function handleGuess(letter) {
+        if (guessedLetters.includes(letter)) return;
+
+        guessedLetters.push(letter);
+        if (selectedWord.includes(letter)) {
+          updateWordDisplay();
+        } else {
+          lives--;
+          updateHangmanImage();
+        }
+
+        if (lives === 0) {
+          gameOver("Game Over! You Lost!");
+        } else if (
+          !document.getElementById("word-display").innerText.includes("_")
+        ) {
+          gameOver("You Win!");
+        }
+      }
+
+      function updateWordDisplay() {
+        let wordDisplay = selectedWord
+          .split("")
+          .map((letter) => (guessedLetters.includes(letter) ? letter : "_"))
+          .join(" ");
+        document.getElementById("word-display").innerText = wordDisplay;
+      }
+
+      function updateHangmanImage() {
+        document.getElementById("game-image").src = "game";
+        6 - lives;
+
+        document.getElementById("lives-left").innerText = lives;
+      }
+
+      function gameOver(message) {
+        document.getElementById("game-message").innerText = message;
+        document.getElementById("game-over").style.display = "block";
+        document.getElementById("game-screen").style.display = "none";
+      }
+
+      function restartGame() {
+        document.getElementById("game-over").style.display = "none";
+        document.getElementById("home-screen").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
